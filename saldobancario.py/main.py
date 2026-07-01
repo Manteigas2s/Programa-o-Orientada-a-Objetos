@@ -1,56 +1,57 @@
 from abc import ABC, abstractmethod
+
 class BancoAbstracao(ABC):
-    pass
+    @abstractmethod
+    def login(self):
+        pass
 
-@abstractmethod
-def login(self):
-    pass
-
-@abstractmethod
-def exibirConta(self):
-    pass
-
-class Banco:
-    def __init__(self, cliente, saldo, senha):
+class Banco(BancoAbstracao):
+    def __init__(self, cliente: str, saldo: float, senha: int):
         self.cliente = cliente
         self.saldo = saldo
-        self.senha = senha
-        self.status = False
+        self.__senha = senha
+        self.__status = False
     
-    def entrada(self):
+    def mostrarMenu(self):
         print("\n--------- Sistema de Saldo Bancário ---------\n")
 
-    def login(self):
+    def validarSenha(self, senha):
+        if senha == "":
+                print("Digite Algo!")
+                return False
+
+        elif not senha.isdigit():
+                print("Erro! Digite apenas números.")
+                return False
+            
+        elif len(senha) !=6:
+                print("6 DÍGITOS OBRIGATÓRIOS!")
+                return False
+        return True
+
+    def login(self) -> bool:
         tentativas = 3
 
         while tentativas > 0:
-            senha_digitada = input("Digite sua senha (Somente números): ")
+            senha = input("Digite sua senha (Somente números): ")
 
-            if senha_digitada == "":
-                print("Digite Algo!")
-                continue
-
-            elif senha_digitada.isdigit() == False:
-                print("Erro! Digite apenas números.")
-                continue
+            if not self.validarSenha(senha):
+                 continue
             
-            elif (len(senha_digitada)!=6):
-                print("6 DÍGITOS OBRIGATÓRIOS!")
-                continue
-
-            elif int(senha_digitada) == self.senha:
-                self.status = True
+            if int(senha) == self.__senha:
+                self.__status = True
                 print("\nLogin realizado com sucesso.\n")
-                break
+                return True
             
-            else:
-                tentativas -= 1
-                print(f"Senha incorreta! Tentativas restantes: {tentativas}")
+            tentativas -= 1     
+            print(f"Senha incorreta! Tentativas restantes: {tentativas}")
         
+        print("Conta Bloqueada.")
+        return False
     
         
-    def exibirConta(self):
-        if self.status:
+    def mostrarDadosConta(self):
+        if self.__status:
             print("===== DADOS DA CONTA =====")
             print("Cliente:", self.cliente)
             print(f"Saldo: R$ {self.saldo:.2f}")
@@ -58,6 +59,8 @@ class Banco:
             print("Acesso Negado!")
 
 conta = Banco("Pedro", 2000, 777777)
-conta.entrada()
-conta.login()
-conta.exibirConta()
+
+conta.mostrarMenu()
+
+if conta.login():
+    conta.mostrarDadosConta()
